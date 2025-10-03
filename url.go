@@ -2,7 +2,6 @@ package url
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -15,7 +14,7 @@ type URL struct {
 func Parse(rawURL string) (*URL, error) {
 	scheme, rest, ok := strings.Cut(rawURL, ":")
 
-	if !ok {
+	if !ok || scheme == "" {
 		return nil, errors.New("missing scheme")
 	}
 
@@ -28,5 +27,24 @@ func Parse(rawURL string) (*URL, error) {
 }
 
 func (u *URL) String() string {
-	return fmt.Sprintf("%s://%s/%s", u.Scheme, u.Host, u.Path)
+	if u == nil {
+		return ""
+	}
+
+	var sb strings.Builder
+	sb.Grow(len(u.Scheme) + 3 + len(u.Host) + 1 + len(u.Path))
+
+	if s := u.Scheme; s != "" {
+		sb.WriteString(s)
+		sb.WriteString("://")
+	}
+	if s := u.Host; s != "" {
+		sb.WriteString(s)
+	}
+	if s := u.Path; s != "" {
+		sb.WriteString("/")
+		sb.WriteString(s)
+	}
+
+	return sb.String()
 }
